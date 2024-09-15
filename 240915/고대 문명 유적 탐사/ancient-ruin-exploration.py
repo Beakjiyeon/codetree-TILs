@@ -52,7 +52,7 @@ def get_count_by_angle(ci, cj, angle):
 
     # 3*3인걸로 업데이트 하기
 
-    # 이렇게 하면 그래프의 값까지 바뀐다. new_graph = graph
+    # 주의 : 이렇게 하면 그래프의 값까지 바뀐다. new_graph = graph
     new_graph = [[0] * 5 for _ in range(5)]
     for x in range(5):
         for y in range(5):
@@ -124,51 +124,42 @@ def remove_treasure():
                 if sum >= 3:
                     result += sum
                     for t in treasure:
-                        graph[t[0]][t[1]] = 0
                         treasure_spot.append((t[0], t[1]))
 
     return treasure_spot
 
 
 rs = []
-for _ in range(K):  # 경K 턴
+# K 턴 마다 무조건 회전해야 함
+for _ in range(K):  
     rsum = 0
-    # rotate_0 = search_treasure()
-    # 무조건 회전해야 함
-    # 90도 회전했을 때 최대 값
     cases = []
-    # get_count_by_angle(2, 2, 90)
+    # 중심점(2,2) 하나로 함수를 테스트 : get_count_by_angle(2, 2, 90)
 
     for ci in range(1, 4):
         for cj in range(1, 4):
-            pass
             # ci, cj 를 기준으로 회전하기
             cases.append(get_count_by_angle(ci, cj, 90))
             cases.append(get_count_by_angle(ci, cj, 180))
             cases.append(get_count_by_angle(ci, cj, 270))
 
     # 최대 케이스 찾기
-
     max_case = sorted(cases, key=lambda x: (-x[3], x[2], x[1], x[0]))[0]
 
-
-    # print(len(cases))
-    # 그래프 비우기
     # 최대일 때 그래프
-
     graph = rotate_graph(max_case[0], max_case[1], max_case[2])
+    
+    # 유적 좌표 구하기
     treasure_spot = remove_treasure()
+    # 유적 개수 더하기
     rsum += len(treasure_spot)
-
+    # 유적 좌표에 벽 값 업데이트
     treasure_spot = sorted(treasure_spot, key=lambda x: (x[1], -x[0]))
     wq = deque(wall)
-
     for ts in treasure_spot:
         graph[ts[0]][ts[1]] = wq.popleft()
-
     wall = list(wq)
 
-    # 그래프 채우기
     # 연쇄 탐색하기
     while True:
         left_treasure_spot = remove_treasure()
